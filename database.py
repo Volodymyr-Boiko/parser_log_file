@@ -63,11 +63,24 @@ class Model(DataBase):
             col2: second column's name.
         """
         test_str = self.__format_string(*args)
-        print test_str
-        command = ('CREATE TABLE {} (id serial PRIMARY KEY NOT NULL UNIQUE, {});'.format(self.table_name, test_str))
+        command = ('CREATE TABLE {} (id serial PRIMARY KEY NOT NULL UNIQUE, '
+                   '{});'.format(self.table_name, test_str))
         self.execute_cur(command)
 
-    def insert_into_table(self, col1, val1, col2, val2):
+    # def insert_into_table(self, col1, val1, col2, val2):
+    #     """Insert new data to the table's columns
+    #     Args:
+    #         col1: first column's name;
+    #         val1: value of the first column;
+    #         col2: second column's name;
+    #         val2: value of the second column.
+    #     """
+    #     command = ('INSERT INTO {} '
+    #                '({}, {}) VALUES (\'{}\', '
+    #                '\'{}\');').format(self.table_name, col1, col2, val1, val2)
+    #     self.execute_cur(command)
+
+    def insert_into_table(self, *columns, **values):
         """Insert new data to the table's columns
         Args:
             col1: first column's name;
@@ -75,9 +88,12 @@ class Model(DataBase):
             col2: second column's name;
             val2: value of the second column.
         """
+        col_string = self.__form_str('column', *columns)
+        val_string = self.__form_str('value', **values)
         command = ('INSERT INTO {} '
-                   '({}, {}) VALUES (\'{}\', '
-                   '\'{}\');').format(self.table_name, col1, col2, val1, val2)
+                   '({}) VALUES ({});').format(self.table_name, col_string,
+                                               val_string)
+        print command
         self.execute_cur(command)
 
     def get_data_by_id(self, id_val, col1, col2):
@@ -106,60 +122,55 @@ class Model(DataBase):
             return 'Name of the table is %s\n' \
                    'Some of column name does not exist' % self.table_name
 
-    def __format_string(self, *kwargs):
-        lst = list(kwargs)
-        lst_1 = []
-        str_ = ''
+    def __format_string(self, *args):
+        lst = list(args)
+        lst_pair = []
+        string = ''
         for item in range(0, len(lst), 2):
-            lst_1.append(lst[item: item + 2])
-        for item in lst_1:
+            lst_pair.append(lst[item: item + 2])
+        for item in lst_pair:
             test_str = ' '.join(item)
-            test_str += ','
-            str_ += test_str
-        lll = str_.split(',')
-        lll.remove('')
-        return ', '.join(lll)
+            test_str += ', '
+            string += test_str
+        return string[0: -2]
+
+    def __form_str(intent='column', *args, **kwargs):
+        s = ''
+        if intent == 'column':
+            for item in args:
+                s += '{}, '.format(item)
+        elif intent == 'value':
+            for name in kwargs:
+                s += '\'{}\', '.format(kwargs[name])
+        return s[0: -2]
 
 
-# sub1 = "python string!"
-# sub2 = "an arg"
-#
-# a = "i am a %s" % sub1
-# b = "i am a {0}".format(sub1)
-#
-# c = "with %(kwarg)s!" % {'kwarg':sub2}
-# d = "with {kwarg}!".format(kwarg=sub2)
-#
-# print a
-# print b
-# print c
-# print d
-#
-# def ff(qqq='qqq', a='111'):
-#     return '{} {}'.format(qqq, a)
-#
-# print ff()
-#
-# def format_string(**kwargs):
-#     string = ''
-#     for item in kwargs:
-#         string += '{} '.format(kwargs.get(item))
-#     return string
-#
-# print format_string(col1='user', type1='vboiko', col2='site', type2='tsn.ua')
-#
+
 def format_string(*kwargs):
     lst = list(kwargs)
-    lst_1 = []
-    str_ = ''
+    lst_pair = []
+    string = ''
     for item in range(0, len(lst), 2):
-        lst_1.append(lst[item: item + 2])
-    for item in lst_1:
+        lst_pair.append(lst[item: item + 2])
+    for item in lst_pair:
         test_str = ' '.join(item)
-        test_str += ','
-        str_ += test_str
-    lll = str_.split(',')
-    lll.remove('')
-    return ', '.join(lll)
+        test_str += ', '
+        string += test_str
+    return string[0: -2]
 
 # print format_string('user', 'vboiko', 'site', 'tsn.ua', 'uniq', '2')
+
+
+def form_str(intent='column', *args, *kwargs):
+    s = ''
+    if intent == 'column':
+        for item in args:
+            s += '{}, '.format(item)
+    elif intent == 'value':
+        for name in kwargs:
+            s += '\'{}\', '.format(name)
+    return s[0: -2]
+
+
+# print form_str('column', 'q', 'w', 'e')
+print form_str('value', '-', 'irvo.net')
