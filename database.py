@@ -162,7 +162,6 @@ def format_string(*kwargs):
 
 
 def form_str(intent='column', *args, **kwargs):
-
     s = ''
     if intent == 'column':
         for item in args:
