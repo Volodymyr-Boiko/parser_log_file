@@ -161,16 +161,18 @@ def format_string(*kwargs):
 # print format_string('user', 'vboiko', 'site', 'tsn.ua', 'uniq', '2')
 
 
-def form_str(intent='column', *args, *kwargs):
+def form_str(intent='column', *args, **kwargs):
     s = ''
     if intent == 'column':
         for item in args:
             s += '{}, '.format(item)
     elif intent == 'value':
-        for name in kwargs:
-            s += '\'{}\', '.format(name)
-    return s[0: -2]
+        lst = sorted(kwargs.keys())
+        # for key, value in kwargs.items():
+            # s += '\'{}\', '.format(key)
+        print lst
+    # return s[0: -2]
 
 
 # print form_str('column', 'q', 'w', 'e')
-print form_str('value', '-', 'irvo.net')
+print form_str('value', val1='-', val2='irvo.net')
