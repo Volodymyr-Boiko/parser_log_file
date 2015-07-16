@@ -83,6 +83,6 @@ def calc_uniq_data(file_name, key1, key2):
     for item in test_list:
         lst_key1.append(item.get(key1))
         lst_key2.append(item.get(key2))
-    test_dict['user'] = len(lst_key1)
-    test_dict['indent'] = len(lst_key2)
+    test_dict[key1] = len(lst_key1)
+    test_dict[key2] = len(lst_key2)
     return test_dict
