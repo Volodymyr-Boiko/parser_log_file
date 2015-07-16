@@ -88,15 +88,15 @@ class Model(DataBase):
             col2: second column's name;
             val2: value of the second column.
         """
-        col_string = self.__form_str('column', *columns)
-        val_string = self.__form_str('value', **values)
+        col_string = self.__form_str_insert('column', *columns)
+        val_string = self.__form_str_insert('value', **values)
         command = ('INSERT INTO {} '
                    '({}) VALUES ({});').format(self.table_name, col_string,
                                                val_string)
         print command
         self.execute_cur(command)
 
-    def get_data_by_id(self, id_val, col1, col2):
+    def get_data_by_id(self, id_val, cols=True, *columns):
         """Gets data from 'status' column by 'id' number
         Args:
             id_val: id value
@@ -104,20 +104,22 @@ class Model(DataBase):
             col2: second column's name.
         Return: Value of each column which taken by 'id' value.
         """
-        command = ('SELECT {3}, {1}, {2} FROM {0} '
-                   'WHERE {3}={4};'.format(self.table_name, col1, col2, 'id',
-                                           str(id_val)))
+        sel_str = self.__form_str_get(cols, *columns)
+        command = ('SELECT {} FROM {} WHERE '
+                   '{}={};'.format(sel_str, self.table_name, 'id', str(id_val)))
         try:
             self.execute_cur(command)
             lst = json.dumps(self.cursor.fetchone())[1: -1].split(',')
             if len(lst) == 1:
                 return 'There is no data in the table'
             else:
+                ##############################
                 return 'Name of the table is %s\n' \
                        'id value is %s\n' \
-                       '%s value is %s\n' \
-                       '%s value is %s' \
-                       % (self.table_name, lst[0], col1, lst[1], col2, lst[2])
+                       'some value is %s\n' \
+                       'some value is %s' \
+                       % (self.table_name, lst[0], lst[1], lst[2])
+            ###############################
         except psycopg2.ProgrammingError:
             return 'Name of the table is %s\n' \
                    'Some of column name does not exist' % self.table_name
@@ -134,7 +136,7 @@ class Model(DataBase):
             string += test_str
         return string[0: -2]
 
-    def __form_str(intent='column', *args, **kwargs):
+    def __form_str_insert(intent='column', *args, **kwargs):
         s = ''
         if intent == 'column':
             for item in args:
@@ -143,6 +145,15 @@ class Model(DataBase):
             for name in kwargs:
                 s += '\'{}\', '.format(kwargs[name])
         return s[0: -2]
+
+    def __form_str_get(self, cols=True, *columns):
+        select_str = ''
+        if cols:
+            for item in columns:
+                select_str += '{} '.format(item)
+        else:
+            select_str = '*'
+        return select_str
 
 
 
@@ -168,11 +179,25 @@ def form_str(intent='column', *args, **kwargs):
             s += '{}, '.format(item)
     elif intent == 'value':
         lst = sorted(kwargs.keys())
+        for item in lst:
+            s += '\'{}\', '.format(kwargs.get(item))
         # for key, value in kwargs.items():
             # s += '\'{}\', '.format(key)
-        print lst
-    # return s[0: -2]
+        # print lst
+    return s[0: -2]
 
 
 # print form_str('column', 'q', 'w', 'e')
-print form_str('value', val1='-', val2='irvo.net')
+#
+# print form_str('value', val1='-', val2='irvo.net')
+
+def __form_str_get(cols=True, *columns):
+        select_str = ''
+        if cols:
+            for item in columns:
+                select_str += '{} '.format(item)
+        else:
+            select_str = '*'
+        return select_str
+
+print __form_str_get(False, 'q','w','e')
