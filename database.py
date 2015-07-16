@@ -45,86 +45,67 @@ class Model(DataBase):
             self.connect()
             self.get_cursor()
 
-    # def create_table(self, col1, col2):
-    #     """Creates a new table with columns
-    #     Args:
-    #         col1: first column's name;
-    #         col2: second column's name.
-    #     """
-    #     command = ('CREATE TABLE {} (id serial PRIMARY KEY NOT NULL UNIQUE, '
-    #                '{} VARCHAR, '
-    #                '{} VARCHAR);'.format(self.table_name, col1, col2))
-    #     self.execute_cur(command)
-
     def create_table(self, *args):
         """Creates a new table with columns
         Args:
-            col1: first column's name;
-            col2: second column's name.
+            *args: columns' name and columns' type.
         """
         test_str = self.__format_string(*args)
         command = ('CREATE TABLE {} (id serial PRIMARY KEY NOT NULL UNIQUE, '
                    '{});'.format(self.table_name, test_str))
         self.execute_cur(command)
 
-    # def insert_into_table(self, col1, val1, col2, val2):
-    #     """Insert new data to the table's columns
-    #     Args:
-    #         col1: first column's name;
-    #         val1: value of the first column;
-    #         col2: second column's name;
-    #         val2: value of the second column.
-    #     """
-    #     command = ('INSERT INTO {} '
-    #                '({}, {}) VALUES (\'{}\', '
-    #                '\'{}\');').format(self.table_name, col1, col2, val1, val2)
-    #     self.execute_cur(command)
-
     def insert_into_table(self, *columns, **values):
         """Insert new data to the table's columns
         Args:
-            col1: first column's name;
-            val1: value of the first column;
-            col2: second column's name;
-            val2: value of the second column.
+            *columns: columns' name;
+            **values: values of the columns
         """
         col_string = self.__form_str_insert('column', *columns)
         val_string = self.__form_str_insert('value', **values)
         command = ('INSERT INTO {} '
                    '({}) VALUES ({});').format(self.table_name, col_string,
                                                val_string)
-        print command
         self.execute_cur(command)
 
     def get_data_by_id(self, id_val, cols=True, *columns):
         """Gets data from 'status' column by 'id' number
         Args:
             id_val: id value
-            col1: first column's name;
-            col2: second column's name.
+            cols: switcher;
+            *columns: columns' name.
         Return: Value of each column which taken by 'id' value.
         """
         sel_str = self.__form_str_get(cols, *columns)
         command = ('SELECT {} FROM {} WHERE '
                    '{}={};'.format(sel_str, self.table_name, 'id', str(id_val)))
+        col = list(columns)
         try:
             self.execute_cur(command)
             lst = json.dumps(self.cursor.fetchone())[1: -1].split(',')
-            if len(lst) == 1:
-                return 'There is no data in the table'
-            else:
-                ##############################
+            if 'ul' in lst:
                 return 'Name of the table is %s\n' \
-                       'id value is %s\n' \
-                       'some value is %s\n' \
-                       'some value is %s' \
-                       % (self.table_name, lst[0], lst[1], lst[2])
-            ###############################
+                       'Data, taken by \'id\' value does not exist' % \
+                       self.table_name
+            elif cols:
+                result = dict(zip(col, lst))
+                return self.__get_data_from_table(cols, **result)
+            elif not cols:
+                test_lst = []
+                for item in lst:
+                    test_lst.append(str(lst.index(item) + 1))
+                test_dict = dict(zip(test_lst, lst))
+                return self.__get_data_from_table(cols, **test_dict)
         except psycopg2.ProgrammingError:
             return 'Name of the table is %s\n' \
-                   'Some of column name does not exist' % self.table_name
+                   'This column(s) does not exist' % self.table_name
 
     def __format_string(self, *args):
+        """Creates a part of command
+        Args:
+            *args: *args: columns' name and columns' type.
+        Return: string, with columns' name and columns' type
+        """
         lst = list(args)
         lst_pair = []
         string = ''
@@ -136,68 +117,53 @@ class Model(DataBase):
             string += test_str
         return string[0: -2]
 
-    def __form_str_insert(intent='column', *args, **kwargs):
-        s = ''
+    def __form_str_insert(self, intent='column', *args, **kwargs):
+        """Creates a part of command
+        Args:
+            intent: switcher;
+            *args: columns' name;
+            **kwargs: values of the columns
+        Return: string, with columns' name or columns' type
+        """
+        string = ''
         if intent == 'column':
             for item in args:
-                s += '{}, '.format(item)
+                string += '{}, '.format(item)
         elif intent == 'value':
             for name in kwargs:
-                s += '\'{}\', '.format(kwargs[name])
-        return s[0: -2]
+                string += '\'{}\', '.format(kwargs[name])
+        return string[0: -2]
 
     def __form_str_get(self, cols=True, *columns):
+        """Creates a part of command
+        Args:
+            cols: switcher;
+            *columns: columns' name.
+        Return: string
+        """
         select_str = ''
         if cols:
             for item in columns:
-                select_str += '{} '.format(item)
+                select_str += '{}, '.format(item)
+            return select_str[0: -2]
         else:
             select_str = '*'
-        return select_str
+            return select_str
 
-
-
-def format_string(*kwargs):
-    lst = list(kwargs)
-    lst_pair = []
-    string = ''
-    for item in range(0, len(lst), 2):
-        lst_pair.append(lst[item: item + 2])
-    for item in lst_pair:
-        test_str = ' '.join(item)
-        test_str += ', '
-        string += test_str
-    return string[0: -2]
-
-# print format_string('user', 'vboiko', 'site', 'tsn.ua', 'uniq', '2')
-
-
-def form_str(intent='column', *args, **kwargs):
-    s = ''
-    if intent == 'column':
-        for item in args:
-            s += '{}, '.format(item)
-    elif intent == 'value':
-        lst = sorted(kwargs.keys())
-        for item in lst:
-            s += '\'{}\', '.format(kwargs.get(item))
-        # for key, value in kwargs.items():
-            # s += '\'{}\', '.format(key)
-        # print lst
-    return s[0: -2]
-
-
-# print form_str('column', 'q', 'w', 'e')
-#
-# print form_str('value', val1='-', val2='irvo.net')
-
-def __form_str_get(cols=True, *columns):
-        select_str = ''
+    def __get_data_from_table(self, cols=True, **kwargs):
+        """Creates a part of command
+        Args:
+            cols: switcher;
+            *kwargs: columns' value.
+        Return: string
+        """
+        res_str = 'Name of the table is %s\n' % self.table_name
         if cols:
-            for item in columns:
-                select_str += '{} '.format(item)
-        else:
-            select_str = '*'
-        return select_str
-
-print __form_str_get(False, 'q','w','e')
+            for item in kwargs:
+                res_str += 'value of the {} column is {}\n'.format(item,
+                                                                   kwargs[item])
+        elif not cols:
+            for item in kwargs:
+                res_str += 'value of the {} column is {}\n'.format(str(item),
+                                                                   kwargs[item])
+        return res_str
