@@ -51,9 +51,14 @@ class Model(DataBase):
             *args: columns' name and columns' type.
         """
         test_str = self.__format_string(*args)
-        command = ('CREATE TABLE {} (id serial PRIMARY KEY NOT NULL UNIQUE, '
-                   '{});'.format(self.table_name, test_str))
-        self.execute_cur(command)
+        command = ('CREATE TABLE {} (id serial PRIMARY KEY NOT NULL UNIQUE,'
+                   ' {});'.format(self.table_name, test_str))
+        try:
+            self.execute_cur(command)
+            return 'Data table created'
+        except psycopg2.ProgrammingError:
+            return 'Data table %s already exist.\n' \
+                   'Please insert another table-name' % self.table_name
 
     def insert_into_table(self, *columns, **values):
         """Insert new data to the table's columns
@@ -66,7 +71,11 @@ class Model(DataBase):
         command = ('INSERT INTO {} '
                    '({}) VALUES ({});').format(self.table_name, col_string,
                                                val_string)
-        self.execute_cur(command)
+        try:
+            self.execute_cur(command)
+            return 'Data insert correctly'
+        except psycopg2.ProgrammingError:
+            return 'Please insert correct name of the columns'
 
     def get_data_by_id(self, id_val, cols=True, *columns):
         """Gets data from 'status' column by 'id' number

@@ -27,7 +27,7 @@ def create_table(cur, *args):
     Args:
         *args: columns' name and columns' type.
     """
-    cur.create_table(*args)
+    return cur.create_table(*args)
 
 
 def insert_data(cur, file_name, key1, key2, uniq='data', *cols):
@@ -45,12 +45,12 @@ def insert_data(cur, file_name, key1, key2, uniq='data', *cols):
         for item in get_uniq_data(file_name, key1, key2):
             vals['val1'] = item.get(key1, '')
             vals['val2'] = item.get(key2, '')
-            cur.insert_into_table(*cols, **vals)
+            return cur.insert_into_table(*cols, **vals)
     elif uniq == 'calc':
         test_dict = calc_uniq_data(file_name, key1, key2)
         vals['val1'] = test_dict.get(key1, '')
         vals['val2'] = test_dict.get(key2, '')
-        cur.insert_into_table(*cols, **vals)
+        return cur.insert_into_table(*cols, **vals)
 
 
 def get_data(cur, val_id, cols=True, *columns):
@@ -66,12 +66,12 @@ def get_data(cur, val_id, cols=True, *columns):
 
 
 if __name__ == '__main__':
-    cur = get_model('vboiko', 'postgres', 'data')
-    create_table(cur, 'sites', 'VARCHAR', 'users', 'VARCHAR')
-    insert_data(cur, 'access.log', 'user', 'indent', 'data', 'sites', 'users')
-    print get_data(cur, 2, True, 'sites', 'users')
+    cur = get_model('vboiko', 'postgres', 'data_')
+    print create_table(cur, 'sites', 'VARCHAR', 'users', 'VARCHAR')
+    # print insert_data(cur, 'access.log', 'user', 'indent', 'data', 'sites', 'users')
+    print get_data(cur, 1, True, 'sites', 'users')
 
-    cur_2 = get_model('vboiko', 'postgres', 'result')
-    create_table(cur_2, 'uniq_users', 'VARCHAR', 'uniq_sites', 'VARCHAR')
-    insert_data(cur_2, 'access.log', 'user', 'indent', 'calc', 'uniq_users', 'uniq_sites')
-    print get_data(cur_2, 1, True, 'uniq_users', 'uniq_sites')
+    # cur_2 = get_model('vboiko', 'postgres', 'result')
+    # create_table(cur_2, 'uniq_users', 'VARCHAR', 'uniq_sites', 'VARCHAR')
+    # insert_data(cur_2, 'access.log', 'user', 'indent', 'calc', 'uniq_users', 'uniq_sites')
+    # print get_data(cur_2, 1, True, 'uniq_users', 'uniq_sites')
