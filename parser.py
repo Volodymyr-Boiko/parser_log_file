@@ -5,8 +5,8 @@
 import re
 
 
-regex = '([(\d\.)]+) (.*?) (.*?) \[(.*?)\] "(.*?)" (\d+) (\d+) "(.*?)" "(.*?)"'
-names = ('host', 'indent', 'user', 'time', 'request', 'status', 'size',
+REGEX = '([(\d\.)]+) (.*?) (.*?) \[(.*?)\] "(.*?)" (\d+) (\d+) "(.*?)" "(.*?)"'
+NAMES = ('host', 'indent', 'user', 'time', 'request', 'status', 'size',
          'referrer', 'user agent')
 
 
@@ -16,8 +16,11 @@ def read_file(file_name):
         file_name: name of the file
     Return: list of the lines from the file
     """
-    with open(file_name, 'r') as file_to_read:
-        return file_to_read.read().split('\n')
+    try:
+        with open(file_name, 'r') as file_to_read:
+            return file_to_read.read().split('\n')
+    except IOError:
+        return []
 
 
 def make_line_list(file_name):
@@ -26,22 +29,22 @@ def make_line_list(file_name):
         file_name: name of the file
     Return: list of dicts
     """
-    global regex, names
+    global REGEX, NAMES
     lst = []
     test_lst = read_file(file_name)
     if '' in test_lst:
         test_lst.remove('')
     for line in test_lst:
         try:
-            reg = re.match(regex, line).groups()
-            test_dict = dict(zip(names, reg))
+            reg = re.match(REGEX, line).groups()
+            test_dict = dict(zip(NAMES, reg))
         except AttributeError:
-            names = ('host', 'indent', 'user', 'time', 'request', 'status',
+            NAMES = ('host', 'indent', 'user', 'time', 'request', 'status',
                      'type', 'size', 'referrer', 'user agent')
-            regex = '([(\d\.)]+) (.*?) (.*?) \[(.*?)\] "(.*?)" (\d+) (.*?) ' \
+            REGEX = '([(\d\.)]+) (.*?) (.*?) \[(.*?)\] "(.*?)" (\d+) (.*?) ' \
                     '"(.*?)" "(.*?)" "(.*?)"'
-            reg = re.match(regex, line).groups()
-            test_dict = dict(zip(names, reg))
+            reg = re.match(REGEX, line).groups()
+            test_dict = dict(zip(NAMES, reg))
         lst.append(test_dict)
     return lst
 
@@ -56,16 +59,19 @@ def get_uniq_data(file_name, key1, key2):
     """
     test_list = make_line_list(file_name)
     lst = []
-    for item in test_list:
-        lst.append({key1: item.get(key1, ''), key2: item.get(key2, '')})
-    collection = set()
-    new_lst = []
-    for item in lst:
-        tup = tuple(item.items())
-        if tup not in collection:
-            collection.add(tup)
-            new_lst.append(item)
-    return new_lst
+    if _check_item(key1, key2):
+        for item in test_list:
+            lst.append({key1: item.get(key1, ''), key2: item.get(key2, '')})
+        collection = set()
+        new_lst = []
+        for item in lst:
+            tup = tuple(item.items())
+            if tup not in collection:
+                collection.add(tup)
+                new_lst.append(item)
+        return new_lst
+    else:
+        return []
 
 
 def calc_uniq_data(file_name, key1, key2):
@@ -80,9 +86,20 @@ def calc_uniq_data(file_name, key1, key2):
     test_dict = {}
     lst_key1 = []
     lst_key2 = []
-    for item in test_list:
-        lst_key1.append(item.get(key1))
-        lst_key2.append(item.get(key2))
-    test_dict[key1] = len(lst_key1)
-    test_dict[key2] = len(lst_key2)
-    return test_dict
+    if _check_item(key1, key2):
+        for item in test_list:
+            lst_key1.append(item.get(key1, 0))
+            lst_key2.append(item.get(key2, 0))
+        test_dict[key1] = len(lst_key1)
+        test_dict[key2] = len(lst_key2)
+        return test_dict
+    else:
+        return {}
+
+
+def _check_item(key1, key2):
+    global NAMES
+    if key1 in NAMES and key2 in NAMES:
+        return True
+    else:
+        return False
