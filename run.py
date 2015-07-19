@@ -93,8 +93,8 @@ def _insert_calc_helper(cur, file_name, key1, key2, *cols):
 
 
 
-if __name__ == '__main__':
-    cur = get_model('wildchild', 'mydb', 'data111')
+# if __name__ == '__main__':
+    # cur = get_model('wildchild', 'mydb', 'data111')
     # print create_table(cur, sites='VARCHAR', users='VARCHAR')
     # insert_data(cur, 'access.log', 'user', 'indent', 'data', 'sites',
     #                   'users')

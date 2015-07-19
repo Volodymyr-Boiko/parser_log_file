@@ -74,9 +74,7 @@ class Model(DataBase):
         try:
             self.execute_cur(command)
         except psycopg2.ProgrammingError:
-            #1111111111111111111111111
             return 'Please insert correct name of the columns or the keys'
-            #1111111111111111111111111
 
     def get_data_by_id(self, id_val, *columns):
         """Gets data from 'status' column by 'id' number
@@ -110,7 +108,6 @@ class Model(DataBase):
         Return: string, with columns' name and columns' type
         """
         dct = dict(kwargs)
-        print dct
         string = ''
         for item in dct:
             string += '{} {}, '.format(item, dct[item])
@@ -145,17 +142,3 @@ class Model(DataBase):
             res_str += 'value of the {} column is {}\n'.format(item,
                                                                kwargs[item])
         return res_str
-
-
-def __format_string(**kwargs):
-        """Creates a part of command
-        Args:
-            args: columns' name and columns' type.
-        Return: string, with columns' name and columns' type
-        """
-        dct = dict(kwargs)
-        print dct
-        string = ''
-        for item in dct:
-            string += '{} {}, '.format(item, dct[item])
-        return string[0: -2]
