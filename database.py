@@ -159,7 +159,3 @@ def __format_string(**kwargs):
         for item in dct:
             string += '{} {}, '.format(item, dct[item])
         return string[0: -2]
-
-
-if __name__ == '__main__':
-    print __format_string(users='VARCHAR', sites='VARCHAR')
