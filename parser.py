@@ -16,11 +16,7 @@ def read_file(file_name):
         file_name: name of the file
     Return: list of the lines from the file
     """
-    try:
-        with open(file_name, 'r') as file_to_read:
-            return file_to_read.read().split('\n')
-    except IOError:
-        return []
+    return _read_file(file_name).split('\n')
 
 
 def make_line_list(file_name):
@@ -95,6 +91,19 @@ def calc_uniq_data(file_name, key1, key2):
         return test_dict
     else:
         return {}
+
+
+def _read_file(file_name):
+    """Reads log file
+    Args:
+        file_name: name of the file
+    Return: file as a string
+    """
+    try:
+        with open(file_name, 'r') as file_to_read:
+            return file_to_read.read()
+    except IOError:
+        return ''
 
 
 def _check_item(key1, key2):
