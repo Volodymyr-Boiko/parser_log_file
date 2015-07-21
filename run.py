@@ -30,6 +30,11 @@ def create_table(cur, **kwargs):
     return cur.create_table(**kwargs)
 
 
+def del_table(cur):
+    """Drops data-table"""
+    cur.drop_table()
+
+
 def insert_data(cur, file_name, key1, key2, uniq='data', *cols):
     """Inserts data into the table
     Args:
@@ -94,7 +99,8 @@ def _insert_calc_helper(cur, file_name, key1, key2, *cols):
 
 
 # if __name__ == '__main__':
-    # cur = get_model('wildchild', 'mydb', 'data111')
+#     cur = get_model('vboiko', 'postgres', 'data111')
+#     del_table(cur)
     # print create_table(cur, sites='VARCHAR', users='VARCHAR')
     # insert_data(cur, 'access.log', 'user', 'indent', 'data', 'sites',
     #                   'users')

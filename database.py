@@ -60,6 +60,11 @@ class Model(DataBase):
             return 'Data table %s already exist.\n' \
                    'Please insert another table-name' % self.table_name
 
+    def drop_table(self):
+        """Drops data-table"""
+        command = 'DROP TABLE {}'.format(self.table_name)
+        self.execute_cur(command)
+
     def insert_into_table(self, *columns, **values):
         """Insert new data to the table's columns
         Args:
