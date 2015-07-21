@@ -10,16 +10,19 @@ NAMES = ('host', 'indent', 'user', 'time', 'request', 'status', 'size',
          'referrer', 'user agent')
 
 
-def read_file(file_name):
+def read_file(file_name, arch=False):
     """Reads log file
     Args:
         file_name: name of the file
     Return: list of the lines from the file
     """
-    return _read_file(file_name).split('\n')
+    if not arch:
+        return _read_file(file_name).split('\n')
+    else:
+        return file_name.split('\n')
 
 
-def make_line_list(file_name):
+def make_line_list(file_name, arch=False):
     """Makes list of file's lines in the dict view
     Args:
         file_name: name of the file
@@ -27,7 +30,7 @@ def make_line_list(file_name):
     """
     global REGEX, NAMES
     lst = []
-    test_lst = read_file(file_name)
+    test_lst = read_file(file_name, arch)
     if '' in test_lst:
         test_lst.remove('')
     for line in test_lst:
@@ -45,7 +48,7 @@ def make_line_list(file_name):
     return lst
 
 
-def get_uniq_data(file_name, key1, key2):
+def get_uniq_data(file_name, key1, key2, arch=False):
     """Gets list of dicts with unique data
     Args:
         file_name: name of the file;
@@ -53,7 +56,7 @@ def get_uniq_data(file_name, key1, key2):
         key2: second key
     Return: list of dicts with unique users and sites
     """
-    test_list = make_line_list(file_name)
+    test_list = make_line_list(file_name, arch)
     lst = []
     if _check_item(key1, key2):
         for item in test_list:
@@ -70,7 +73,7 @@ def get_uniq_data(file_name, key1, key2):
         return []
 
 
-def calc_uniq_data(file_name, key1, key2):
+def calc_uniq_data(file_name, key1, key2, arch=False):
     """Gets list of dicts with unique data
     Args:
         file_name: name of the file;
@@ -78,7 +81,7 @@ def calc_uniq_data(file_name, key1, key2):
         key2: second key
     Return: dict with number of unique users and sites
     """
-    test_list = get_uniq_data(file_name, key1, key2)
+    test_list = get_uniq_data(file_name, key1, key2, arch)
     test_dict = {}
     lst_key1 = []
     lst_key2 = []

@@ -35,7 +35,7 @@ def del_table(cur):
     cur.drop_table()
 
 
-def insert_data(cur, file_name, key1, key2, uniq='data', *cols):
+def insert_data(cur, file_name, key1, key2, uniq='data', arch=False, *cols):
     """Inserts data into the table
     Args:
         cur: cursor;
@@ -46,9 +46,9 @@ def insert_data(cur, file_name, key1, key2, uniq='data', *cols):
         cols: columns' name.
     """
     if uniq == 'data':
-        _insert_data_helper(cur, file_name, key1, key2, *cols)
+        _insert_data_helper(cur, file_name, key1, key2, arch, *cols)
     elif uniq == 'calc':
-        _insert_calc_helper(cur, file_name, key1, key2, *cols)
+        _insert_calc_helper(cur, file_name, key1, key2, arch, *cols)
 
 
 def get_data(cur, val_id, *columns):
@@ -63,7 +63,7 @@ def get_data(cur, val_id, *columns):
     return cur.get_data_by_id(val_id, *columns)
 
 
-def _insert_data_helper(cur, file_name, key1, key2, *cols):
+def _insert_data_helper(cur, file_name, key1, key2, arch=False, *cols):
     """Inserts data into the table
     Args:
         cur: cursor;
@@ -74,14 +74,14 @@ def _insert_data_helper(cur, file_name, key1, key2, *cols):
     """
     lst = []
     val = ['val1', 'val2']
-    for item in get_uniq_data(file_name, key1, key2):
+    for item in get_uniq_data(file_name, key1, key2, arch):
         test_dic = dict(zip(val, item.values()))
         lst.append(test_dic)
     for value in lst:
         cur.insert_into_table(*cols, **value)
 
 
-def _insert_calc_helper(cur, file_name, key1, key2, *cols):
+def _insert_calc_helper(cur, file_name, key1, key2, arch=False, *cols):
     """Inserts data into the table
     Args:
         cur: cursor;
@@ -91,7 +91,7 @@ def _insert_calc_helper(cur, file_name, key1, key2, *cols):
         cols: columns' name.
     """
     vals = {}
-    test_dict = calc_uniq_data(file_name, key1, key2)
+    test_dict = calc_uniq_data(file_name, key1, key2, arch)
     vals['val1'] = test_dict.get(key1, '')
     vals['val2'] = test_dict.get(key2, '')
     cur.insert_into_table(*cols, **vals)
