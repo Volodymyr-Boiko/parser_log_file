@@ -39,7 +39,7 @@ class Archives(object):
         try:
             if self.type_of_arch == 'zip':
                 with ZipFile(arch_file, 'r') as my_zip:
-                    for item in self.__get_file_names():
+                    for item in self.__get_file_names(arch_file):
                         test_dict[item] = my_zip.read(item)
                 return test_dict
             elif self.type_of_arch == 'tar':
