@@ -25,9 +25,9 @@ def get_model(user, database, table_name):
 def create_table(cur, **kwargs):
     """Creates a new table
     Args:
-        args: columns' name and columns' type.
+        kwargs: columns' name and columns' type.
     """
-    return cur.create_table(**kwargs)
+    cur.create_table(**kwargs)
 
 
 def del_table(cur):
@@ -97,15 +97,30 @@ def _insert_calc_helper(cur, file_name, key1, key2, arch=False, *cols):
     cur.insert_into_table(*cols, **vals)
 
 
+def get(cur):
+    return tuple(cur.get_descr())
 
-# if __name__ == '__main__':
-#     cur = get_model('vboiko', 'postgres', 'data111')
-#     del_table(cur)
-    # print create_table(cur, sites='VARCHAR', users='VARCHAR')
-    # insert_data(cur, 'access.log', 'user', 'indent', 'data', 'sites',
-    #                   'users')
-    # print get_data(cur, 1, 'id', 'sites', 'users')
+if __name__ == '__main__':
+    # import logging
+    #
+    #
+    # logging.basicConfig(level=logging.DEBUG)
+    # # logging.debug( u'This is a debug message' )
+    # x = 5.0
+    # if x == 5:
+    #     logging.info( u'This is an info message' )
+    # else:
+    #     logging.warning( u'This is a warning' )
+    #     logging.error( u'This is an error message' )
+    #     logging.critical( u'FATAL!!!' )
+    cur = get_model('vboiko', 'postgres', 'data_table')
+    # del_table(cur)
+    # create_table(cur, sites='VARCHAR', users='VARCHAR')
+    # insert_data(cur, 'access.log', 'user', 'indent', 'data', False, 'sites',
+    #             'users')
+    print get_data(cur, 1, get(cur))
     # print get_data(cur, 2, 'id', 'sites', 'users')
+    print get(cur)
 
     # cur_2 = get_model('vboiko', 'postgres', 'result')
     # create_table(cur_2, 'uniq_users', 'VARCHAR', 'uniq_sites', 'VARCHAR')
