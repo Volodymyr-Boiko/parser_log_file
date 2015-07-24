@@ -1,9 +1,12 @@
 #! /usr/bin/python
 """Create database"""
 
-
 import json
+import logging
 import psycopg2
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class DataBase(object):
@@ -24,6 +27,11 @@ class DataBase(object):
         """Open a cursor to perform database operations"""
         if self.conn is not None:
             self.cursor = self.conn.cursor()
+
+    def descr(self):
+        if self.conn is not None:
+            desc = self.cursor.description
+            return desc
 
     def execute_cur(self, command):
         """Execute a command. Make the changes to the database persistent"""
@@ -55,15 +63,19 @@ class Model(DataBase):
                    ' {});'.format(self.table_name, test_str))
         try:
             self.execute_cur(command)
-            return 'Data table created'
+            logging.info('Data table created')
         except psycopg2.ProgrammingError:
-            return 'Data table %s already exist.\n' \
-                   'Please insert another table-name' % self.table_name
+            logging.error('Data table %s already exist.\n' \
+                          'Please insert another table-name' % self.table_name)
 
     def drop_table(self):
         """Drops data-table"""
         command = 'DROP TABLE {}'.format(self.table_name)
-        self.execute_cur(command)
+        try:
+            self.execute_cur(command)
+            logging.info('Data table %s dropped' % self.table_name)
+        except psycopg2.ProgrammingError:
+            logging.error('Data table %s already dropped' % self.table_name)
 
     def insert_into_table(self, *columns, **values):
         """Insert new data to the table's columns
@@ -78,8 +90,10 @@ class Model(DataBase):
                                                val_string)
         try:
             self.execute_cur(command)
-        except psycopg2.ProgrammingError:
-            return 'Please insert correct name of the columns or the keys'
+            logging.info('Data insert correctly')
+        except psycopg2.InternalError, psycopg2.ProgrammingError:
+            logging.error('Please insert correct name of the '
+                          'columns or the keys')
 
     def get_data_by_id(self, id_val, *columns):
         """Gets data from 'status' column by 'id' number
@@ -89,22 +103,26 @@ class Model(DataBase):
             columns: columns' name.
         Return: Value of each column which taken by 'id' value.
         """
-        command = ('SELECT * FROM {} WHERE '
-                   '{}={};'.format(self.table_name, 'id', str(id_val)))
-        col = list(columns)
-        try:
-            self.execute_cur(command)
-            lst = json.dumps(self.cursor.fetchone())[1: -1].split(',')
-            if 'ul' in lst:
-                return 'Name of the table is %s\n' \
-                       'Data, taken by \'id\' value does not exist' % \
-                       self.table_name
-            else:
-                result = dict(zip(col, lst))
-                return self.__get_data_from_table(**result)
-        except psycopg2.ProgrammingError:
-            return 'Name of the table is %s\n' \
-                   'This column(s) does not exist' % self.table_name
+        if isinstance(id_val, int):
+            command = ('SELECT * FROM {} WHERE '
+                       '{}={};'.format(self.table_name, 'id', str(id_val)))
+            col = list(columns)
+            # col = self.get_descr()
+            try:
+                self.execute_cur(command)
+                lst = json.dumps(self.cursor.fetchone())[1: -1].split(',')
+                if 'ul' in lst:
+                    logging.warning('Name of the table is %s\n Data, taken by '
+                                    '\'id\' value does not exist' %
+                                    self.table_name)
+                else:
+                    result = dict(zip(col, lst))
+                    return self.__get_data_from_table(**result)
+            except psycopg2.ProgrammingError:
+                logging.error('Name of the table is %s\n' \
+                              'This column(s) does not exist' % self.table_name)
+        else:
+            logging.error('\'id\' must be integer')
 
     def __format_string(self, **kwargs):
         """Creates a part of command
@@ -147,3 +165,7 @@ class Model(DataBase):
             res_str += 'value of the {} column is {}\n'.format(item,
                                                                kwargs[item])
         return res_str
+    #
+    # def get_descr(self):
+    #     colnames = [desc[0] for desc in self.descr()]
+    #     return colnames
