@@ -70,7 +70,15 @@ def update_data(cur, val_id, **kwargs):
         id_vad: 'id' value
         kwargs: names of the columns and their values
     """
-    return cur.update_data_by_id(val_id, **kwargs)
+    cur.update_data_by_id(val_id, **kwargs)
+
+
+def delete_data(cur, **kwargs):
+    """Deletes data from a table
+    Args:
+        kwargs: column name and column value
+    """
+    cur.del_data(**kwargs)
 
 
 def _insert_data_helper(cur, file_name, key1, key2, arch=False, *cols):
@@ -109,13 +117,14 @@ def _insert_calc_helper(cur, file_name, key1, key2, arch=False, *cols):
 
 if __name__ == '__main__':
     cur = get_model('vboiko', 'postgres', 'data_table')
-    # del_table(cur)
+    del_table(cur)
     # create_table(cur, sites='VARCHAR', users='VARCHAR')
     # insert_data(cur, 'access.log', 'user', 'indent', 'data', False, 'users',
     #             'sites')
-    update_data(cur, 1, sites=2, users='2')
-    # print get_data(cur, 1, 'id', 'sites', 'users')
-    # print get_data(cur, 2, 'id', 'sites', 'users')
+    # update_data(cur, 1, sites=2, users='2')
+    # delete_data(cur, sites="2", users='2')
+    # print get_data(cur, 3, 'id', 'sites', 'users')
+    # print get_data(cur, 4, 'id', 'sites', 'users')
 
     # cur_2 = get_model('vboiko', 'postgres', 'result')
     # create_table(cur_2, 'uniq_users', 'VARCHAR', 'uniq_sites', 'VARCHAR')

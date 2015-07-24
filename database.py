@@ -129,13 +129,27 @@ class Model(DataBase):
             id_vad: 'id' value
             kwargs: names of the columns and their values
         """
-        command_line = self.__format_update(**kwargs)
+        command_line = self.__format_update_del(False, **kwargs)
         command = 'UPDATE {} SET {} WHERE ' \
                   'id={};'.format(self.table_name, command_line, id_val)
         try:
             self.execute_cur(command)
             logging.info('Data update correctly')
         except psycopg2.ProgrammingError:
+            logging.error('Please insert the correct column name or data')
+
+    def del_data(self, **kwargs):
+        """Deletes data from a table
+        Args:
+            kwargs: column name and column value
+        """
+        command_line = self.__format_update_del(True, **kwargs)
+        command = 'DELETE FROM {} WHERE {}'.format(self.table_name,
+                                                   command_line)
+        try:
+            self.execute_cur(command)
+            logging.info('Data delete correctly')
+        except:
             logging.error('Please insert the correct column name or data')
 
     def __format_string(self, **kwargs):
@@ -180,12 +194,48 @@ class Model(DataBase):
                                                                kwargs[item])
         return res_str
 
-    def __format_update(self, **kwargs):
+    def __format_update_del(self, delete=False, **kwargs):
         """Creates part of a command to update data-table
         Args:
+            delete: if delete=False, function used for update data, and if
+                    delete=True - function used for delete data
             kwargs: names of the columns and their values
         """
         string = ''
-        for name in kwargs:
-            string += '{}=\'{}\', '.format(name, kwargs.get(name, ''))
-        return string[: -2]
+        if not delete:
+            for name in kwargs:
+                string += '{}=\'{}\', '.format(name, kwargs.get(name, ''))
+            return string[: -2]
+        else:
+            if len(kwargs) == 1:
+                for name in kwargs:
+                    string += '{}=\'{}\''.format(name, kwargs.get(name, ''))
+                return string
+            elif len(kwargs) > 1:
+                for name in kwargs:
+                    string += '{}=\'{}\' AND '.format(name, kwargs.get(name, ''))
+                return string[:-5]
+
+#
+# def __format_update(delete=False, **kwargs):
+#         """Creates part of a command to update data-table
+#         Args:
+#             kwargs: names of the columns and their values
+#         """
+#         string = ''
+#         if not delete:
+#             for name in kwargs:
+#                 string += '{}=\'{}\', '.format(name, kwargs.get(name, ''))
+#             return string[: -2]
+#         else:
+#             if len(kwargs) == 1:
+#                 for name in kwargs:
+#                     string += '{}=\'{}\''.format(name, kwargs.get(name, ''))
+#                 return string
+#             elif len(kwargs) > 1:
+#                 for name in kwargs:
+#                     string += '{}=\'{}\' AND '.format(name, kwargs.get(name, ''))
+#                 return string[:-5]
+#
+# if __name__ == '__main__':
+#     print __format_update(True, ss=4, qq=1444)
