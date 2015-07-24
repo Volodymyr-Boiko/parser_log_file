@@ -215,27 +215,3 @@ class Model(DataBase):
                 for name in kwargs:
                     string += '{}=\'{}\' AND '.format(name, kwargs.get(name, ''))
                 return string[:-5]
-
-#
-# def __format_update(delete=False, **kwargs):
-#         """Creates part of a command to update data-table
-#         Args:
-#             kwargs: names of the columns and their values
-#         """
-#         string = ''
-#         if not delete:
-#             for name in kwargs:
-#                 string += '{}=\'{}\', '.format(name, kwargs.get(name, ''))
-#             return string[: -2]
-#         else:
-#             if len(kwargs) == 1:
-#                 for name in kwargs:
-#                     string += '{}=\'{}\''.format(name, kwargs.get(name, ''))
-#                 return string
-#             elif len(kwargs) > 1:
-#                 for name in kwargs:
-#                     string += '{}=\'{}\' AND '.format(name, kwargs.get(name, ''))
-#                 return string[:-5]
-#
-# if __name__ == '__main__':
-#     print __format_update(True, ss=4, qq=1444)
