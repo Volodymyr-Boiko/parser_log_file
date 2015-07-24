@@ -118,7 +118,7 @@ if __name__ == '__main__':
     # create_table(cur, sites='VARCHAR', users='VARCHAR')
     # insert_data(cur, 'access.log', 'user', 'indent', 'data', False, 'sites',
     #             'users')
-    print get_data(cur, 1, get(cur))
+    # print get_data(cur, 1, *get(cur))
     # print get_data(cur, 2, 'id', 'sites', 'users')
     print get(cur)
 

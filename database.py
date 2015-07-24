@@ -1,7 +1,6 @@
 #! /usr/bin/python
 """Create database"""
 
-
 import json
 import logging
 import psycopg2
@@ -19,7 +18,6 @@ class DataBase(object):
         self.password = password
         self.conn = None
         self.cursor = None
-        # self.desc = None
 
     def connect(self):
         """Connect to an existing database"""
@@ -54,7 +52,6 @@ class Model(DataBase):
         if self.conn is not None:
             self.connect()
             self.get_cursor()
-            # self.descr()
 
     def create_table(self, **kwargs):
         """Creates a new table with columns
@@ -115,7 +112,7 @@ class Model(DataBase):
                 self.execute_cur(command)
                 lst = json.dumps(self.cursor.fetchone())[1: -1].split(',')
                 if 'ul' in lst:
-                    logging.warning('Name of the table is %s\n' 'Data, taken by '
+                    logging.warning('Name of the table is %s\n Data, taken by '
                                     '\'id\' value does not exist' %
                                     self.table_name)
                 else:
@@ -168,7 +165,7 @@ class Model(DataBase):
             res_str += 'value of the {} column is {}\n'.format(item,
                                                                kwargs[item])
         return res_str
-
-    def get_descr(self):
-        colnames = [desc[0] for desc in self.descr()]
-        return colnames
+    #
+    # def get_descr(self):
+    #     colnames = [desc[0] for desc in self.descr()]
+    #     return colnames
