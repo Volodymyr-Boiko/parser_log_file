@@ -107,7 +107,6 @@ class Model(DataBase):
             command = ('SELECT * FROM {} WHERE '
                        '{}={};'.format(self.table_name, 'id', str(id_val)))
             col = list(columns)
-            # col = self.get_descr()
             try:
                 self.execute_cur(command)
                 lst = json.dumps(self.cursor.fetchone())[1: -1].split(',')
@@ -123,6 +122,21 @@ class Model(DataBase):
                               'This column(s) does not exist' % self.table_name)
         else:
             logging.error('\'id\' must be integer')
+
+    def update_data_by_id(self, id_val, **kwargs):
+        """Updates data_table
+        Args:
+            id_vad: 'id' value
+            kwargs: names of the columns and their values
+        """
+        command_line = self.__format_update(**kwargs)
+        command = 'UPDATE {} SET {} WHERE ' \
+                  'id={};'.format(self.table_name, command_line, id_val)
+        try:
+            self.execute_cur(command)
+            logging.info('Data update correctly')
+        except psycopg2.ProgrammingError:
+            logging.error('Please insert the correct column name or data')
 
     def __format_string(self, **kwargs):
         """Creates a part of command
@@ -165,7 +179,13 @@ class Model(DataBase):
             res_str += 'value of the {} column is {}\n'.format(item,
                                                                kwargs[item])
         return res_str
-    #
-    # def get_descr(self):
-    #     colnames = [desc[0] for desc in self.descr()]
-    #     return colnames
+
+    def __format_update(self, **kwargs):
+        """Creates part of a command to update data-table
+        Args:
+            kwargs: names of the columns and their values
+        """
+        string = ''
+        for name in kwargs:
+            string += '{}=\'{}\', '.format(name, kwargs.get(name, ''))
+        return string[: -2]
