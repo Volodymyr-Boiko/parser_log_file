@@ -144,12 +144,12 @@ class Model(DataBase):
             kwargs: column name and column value
         """
         command_line = self.__format_update_del(True, **kwargs)
-        command = 'DELETE FROM {} WHERE {}'.format(self.table_name,
+        command = 'DELETE FROM {} WHERE {};'.format(self.table_name,
                                                    command_line)
         try:
             self.execute_cur(command)
             logging.info('Data delete correctly')
-        except:
+        except psycopg2.ProgrammingError:
             logging.error('Please insert the correct column name or data')
 
     def __format_string(self, **kwargs):
