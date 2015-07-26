@@ -18,6 +18,7 @@ class DataBase(object):
         self.password = password
         self.conn = None
         self.cursor = None
+        self.desc = None
 
     def connect(self):
         """Connect to an existing database"""
@@ -27,11 +28,6 @@ class DataBase(object):
         """Open a cursor to perform database operations"""
         if self.conn is not None:
             self.cursor = self.conn.cursor()
-
-    def descr(self):
-        if self.conn is not None:
-            desc = self.cursor.description
-            return desc
 
     def execute_cur(self, command):
         """Execute a command. Make the changes to the database persistent"""
