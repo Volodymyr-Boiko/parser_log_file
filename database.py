@@ -18,7 +18,6 @@ class DataBase(object):
         self.password = password
         self.conn = None
         self.cursor = None
-        self.desc = None
 
     def connect(self):
         """Connect to an existing database"""
