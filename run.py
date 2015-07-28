@@ -118,9 +118,9 @@ def _insert_calc_helper(cur, file_name, key1, key2, arch=False, *cols):
 if __name__ == '__main__':
     cur = get_model('vboiko', 'postgres', 'data_table')
     del_table(cur)
-    # create_table(cur, sites='VARCHAR', users='VARCHAR')
-    # insert_data(cur, 'access.log', 'user', 'indent', 'data', False, 'users',
-    #             'sites')
+    create_table(cur, sites='VARCHAR', users='VARCHAR')
+    insert_data(cur, 'access.log', 'user', 'indent', 'data', False, 'users',
+                'sites')
     # update_data(cur, 1, sites=2, users='2')
     # delete_data(cur, sites="2", users='2')
     # print get_data(cur, 3, 'id', 'sites', 'users')
