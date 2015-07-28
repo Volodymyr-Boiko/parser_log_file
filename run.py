@@ -35,7 +35,7 @@ def del_table(cur):
     cur.drop_table()
 
 
-def insert_data(cur, file_name, key1, key2, uniq='data', arch=False, *cols):
+def insert_data(cur, file_name, key1, key2, cols, uniq='data', arch=False):
     """Inserts data into the table
     Args:
         cur: cursor;
@@ -45,10 +45,10 @@ def insert_data(cur, file_name, key1, key2, uniq='data', arch=False, *cols):
         uniq: switcher;
         cols: columns' name.
     """
-    if uniq == 'data':
-        _insert_data_helper(cur, file_name, key1, key2, arch, *cols)
-    elif uniq == 'calc':
-        _insert_calc_helper(cur, file_name, key1, key2, arch, *cols)
+    method = _insert_data_helper
+    if uniq == 'calc':
+        method = _insert_calc_helper
+    method(cur, file_name, key1, key2, cols, arch)
 
 
 def get_data(cur, val_id, *columns):
@@ -81,7 +81,7 @@ def delete_data(cur, **kwargs):
     cur.del_data(**kwargs)
 
 
-def _insert_data_helper(cur, file_name, key1, key2, arch=False, *cols):
+def _insert_data_helper(cur, file_name, key1, key2, cols, arch=False):
     """Inserts data into the table
     Args:
         cur: cursor;
@@ -95,11 +95,12 @@ def _insert_data_helper(cur, file_name, key1, key2, arch=False, *cols):
     for item in get_uniq_data(file_name, key1, key2, arch):
         test_dic = dict(zip(val, item.values()))
         lst.append(test_dic)
+    # import pdb; pdb.set_trace()
     for value in lst:
-        cur.insert_into_table(*cols, **value)
+        cur.insert_into_table(cols, value.values())
 
 
-def _insert_calc_helper(cur, file_name, key1, key2, arch=False, *cols):
+def _insert_calc_helper(cur, file_name, key1, key2, cols, arch=False):
     """Inserts data into the table
     Args:
         cur: cursor;
@@ -108,23 +109,23 @@ def _insert_calc_helper(cur, file_name, key1, key2, arch=False, *cols):
         key2: second key
         cols: columns' name.
     """
-    vals = {}
+    vals = []
     test_dict = calc_uniq_data(file_name, key1, key2, arch)
-    vals['val1'] = test_dict.get(key1, '')
-    vals['val2'] = test_dict.get(key2, '')
-    cur.insert_into_table(*cols, **vals)
+    vals.append(test_dict.get(key1, ''))
+    vals.append(test_dict.get(key2, ''))
+    cur.insert_into_table(cols, vals)
 
 
 if __name__ == '__main__':
     cur = get_model('vboiko', 'postgres', 'data_table')
-    del_table(cur)
-    create_table(cur, sites='VARCHAR', users='VARCHAR')
-    insert_data(cur, 'access.log', 'user', 'indent', 'data', False, 'users',
-                'sites')
-    update_data(cur, 1, sites=2, users='2')
-    delete_data(cur, sites="2", users='2')
-    # print get_data(cur, 3, 'id', 'sites', 'users')
-    # print get_data(cur, 4, 'id', 'sites', 'users')
+    # del_table(cur)
+    # create_table(cur, sites='VARCHAR', users='VARCHAR')
+    # insert_data(cur, 'access.log', 'user', 'indent', ['users', 'sites'], 'data',
+    #             False)
+    # update_data(cur, 1, sites=2, users='2')
+    # delete_data(cur, sites="2", users='2')
+    print get_data(cur, 1)
+    print get_data(cur, 2)
 
     # cur_2 = get_model('vboiko', 'postgres', 'result')
     # create_table(cur_2, 'uniq_users', 'VARCHAR', 'uniq_sites', 'VARCHAR')

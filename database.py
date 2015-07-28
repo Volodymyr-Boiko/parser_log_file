@@ -28,6 +28,11 @@ class DataBase(object):
         if self.conn is not None:
             self.cursor = self.conn.cursor()
 
+    def get_description(self):
+        if self.conn is not None:
+            for item in self.cursor:
+                self.desc = item.description
+
     def execute_cur(self, command):
         """Execute a command. Make the changes to the database persistent"""
         self.cursor.execute(command)
@@ -72,14 +77,14 @@ class Model(DataBase):
         except psycopg2.ProgrammingError:
             logging.error('Data table %s already dropped' % self.table_name)
 
-    def insert_into_table(self, *columns, **values):
+    def insert_into_table(self, columns, values):
         """Insert new data to the table's columns
         Args:
             columns: columns' name;
             values: values of the columns
         """
-        col_string = self.__form_str_insert('column', *columns)
-        val_string = self.__form_str_insert('value', **values)
+        col_string = self.__form_str_insert(columns, 'column')
+        val_string = self.__form_str_insert(values, 'value')
         command = ('INSERT INTO {} '
                    '({}) VALUES ({});').format(self.table_name, col_string,
                                                val_string)
@@ -101,7 +106,6 @@ class Model(DataBase):
         if isinstance(id_val, int):
             command = ('SELECT * FROM {} WHERE '
                        '{}={};'.format(self.table_name, 'id', str(id_val)))
-            col = list(columns)
             try:
                 self.execute_cur(command)
                 lst = json.dumps(self.cursor.fetchone())[1: -1].split(',')
@@ -110,7 +114,8 @@ class Model(DataBase):
                                     '\'id\' value does not exist' %
                                     self.table_name)
                 else:
-                    result = dict(zip(col, lst))
+                    result = dict(zip([item[0] for item in
+                                       self.cursor.description], lst))
                     return self.__get_data_from_table(**result)
             except psycopg2.ProgrammingError:
                 logging.error('Name of the table is %s\n' \
@@ -159,7 +164,7 @@ class Model(DataBase):
             string += '{} {}, '.format(item, dct[item])
         return string[0: -2]
 
-    def __form_str_insert(self, intent='column', *args, **kwargs):
+    def __form_str_insert(self, args, value='column'):
         """Creates a part of command
         Args:
             intent: switcher;
@@ -168,12 +173,12 @@ class Model(DataBase):
         Return: string, with columns' name or columns' type
         """
         string = ''
-        if intent == 'column':
+        if value == 'column':
             for item in args:
                 string += '{}, '.format(item)
-        elif intent == 'value':
-            for name in kwargs:
-                string += '\'{}\', '.format(kwargs[name])
+        elif value == 'value':
+            for val in args:
+                string += '\'{}\', '.format(val)
         return string[0: -2]
 
     def __get_data_from_table(self, **kwargs):
@@ -208,5 +213,6 @@ class Model(DataBase):
                 return string
             elif len(kwargs) > 1:
                 for name in kwargs:
-                    string += '{}=\'{}\' AND '.format(name, kwargs.get(name, ''))
+                    string += '{}=\'{}\' AND '.format(name,
+                                                      kwargs.get(name, ''))
                 return string[:-5]
