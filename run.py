@@ -121,8 +121,8 @@ if __name__ == '__main__':
     create_table(cur, sites='VARCHAR', users='VARCHAR')
     insert_data(cur, 'access.log', 'user', 'indent', 'data', False, 'users',
                 'sites')
-    # update_data(cur, 1, sites=2, users='2')
-    # delete_data(cur, sites="2", users='2')
+    update_data(cur, 1, sites=2, users='2')
+    delete_data(cur, sites="2", users='2')
     # print get_data(cur, 3, 'id', 'sites', 'users')
     # print get_data(cur, 4, 'id', 'sites', 'users')
 
