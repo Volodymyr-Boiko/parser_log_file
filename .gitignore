@@ -1,8 +1,2 @@
-bin
-include
-lib
-share
 *.pyc
 .Python
-pip-selfcheck.json
-*.log
