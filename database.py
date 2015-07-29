@@ -95,7 +95,7 @@ class Model(DataBase):
             logging.error('Please insert correct name of the '
                           'columns or the keys')
 
-    def get_data_by_id(self, id_val, *columns):
+    def get_data_by_id(self, id_val):
         """Gets data from 'status' column by 'id' number
         Args:
             id_val: id value
@@ -145,7 +145,7 @@ class Model(DataBase):
         """
         command_line = self.__format_update_del(True, **kwargs)
         command = 'DELETE FROM {} WHERE {};'.format(self.table_name,
-                                                   command_line)
+                                                    command_line)
         try:
             self.execute_cur(command)
             logging.info('Data delete correctly')
