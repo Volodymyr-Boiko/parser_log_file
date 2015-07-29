@@ -51,16 +51,14 @@ def insert_data(cur, file_name, key1, key2, cols, uniq='data', arch=False):
     method(cur, file_name, key1, key2, cols, arch)
 
 
-def get_data(cur, val_id, *columns):
+def get_data(cur, val_id):
     """Gets the data from the table by value of 'id'
     Args:
         cur: cursor;
         val_id: value of 'id';
-        cols: switcher;
-        columns: columns' name.
     Return: Value of each column which taken by 'id' value.
     """
-    return cur.get_data_by_id(val_id, *columns)
+    return cur.get_data_by_id(val_id)
 
 
 def update_data(cur, val_id, **kwargs):
@@ -117,15 +115,15 @@ def _insert_calc_helper(cur, file_name, key1, key2, cols, arch=False):
 
 
 if __name__ == '__main__':
-    cur = get_model('vboiko', 'postgres', 'data_table')
-    # del_table(cur)
-    # create_table(cur, sites='VARCHAR', users='VARCHAR')
+    cur = get_model('vboiko', 'postgres', 'my_table')
+    del_table(cur)
+    # create_table(cur, sites='VARCHAR', users='VACHAR')
     # insert_data(cur, 'access.log', 'user', 'indent', ['users', 'sites'], 'data',
     #             False)
     # update_data(cur, 1, sites=2, users='2')
-    # delete_data(cur, sites="2", users='2')
-    print get_data(cur, 1)
-    print get_data(cur, 2)
+    delete_data(cur, sites="2", users='2')
+    # print get_data(cur, 1)
+    # print get_data(cur, 2)
 
     # cur_2 = get_model('vboiko', 'postgres', 'result')
     # create_table(cur_2, 'uniq_users', 'VARCHAR', 'uniq_sites', 'VARCHAR')
