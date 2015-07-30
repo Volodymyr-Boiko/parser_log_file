@@ -28,11 +28,6 @@ class DataBase(object):
         if self.conn is not None:
             self.cursor = self.conn.cursor()
 
-    def get_description(self):
-        if self.conn is not None:
-            for item in self.cursor:
-                self.desc = item.description
-
     def execute_cur(self, command):
         """Execute a command. Make the changes to the database persistent"""
         self.cursor.execute(command)
