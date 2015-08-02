@@ -112,20 +112,3 @@ def _insert_calc_helper(cur, file_name, key1, key2, cols, arch=False):
     vals.append(test_dict.get(key1, ''))
     vals.append(test_dict.get(key2, ''))
     cur.insert_into_table(cols, vals)
-
-
-if __name__ == '__main__':
-    cur = get_model('vboiko', 'postgres', 'my_table')
-    del_table(cur)
-    # create_table(cur, sites='VARCHAR', users='VACHAR')
-    # insert_data(cur, 'access.log', 'user', 'indent', ['users', 'sites'], 'data',
-    #             False)
-    # update_data(cur, 1, sites=2, users='2')
-    delete_data(cur, sites="2", users='2')
-    # print get_data(cur, 1)
-    # print get_data(cur, 2)
-
-    # cur_2 = get_model('vboiko', 'postgres', 'result')
-    # create_table(cur_2, 'uniq_users', 'VARCHAR', 'uniq_sites', 'VARCHAR')
-    # insert_data(cur_2, 'access.log', 'user', 'indent', 'calc', 'uniq_users', 'uniq_sites')
-    # print get_data(cur_2, 1, True, 'uniq_users', 'uniq_sites')
